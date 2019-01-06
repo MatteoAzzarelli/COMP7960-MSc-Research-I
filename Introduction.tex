@@ -15,7 +15,7 @@
   
     The population is represented in a graph \verb|G(V,E)|, so each person is a node, vertex \verb|V|~$\in$~\verb|G|, of this graph and the contacts between two person is represented by a link, edge \verb|E|~$\in$~\verb|G|, that connect this two nodes.
   
-    The disease status is represented by the SIR\textsuperscript{\ref{fnote:SIR}} model.
+    The disease status is represented by the SIR\textsuperscript{\ref{fnote:SIR}} model, the diagram showed in Fig.\ref{fig:SIRDiagram}.
     Each node \verb|V| can assume four status:
     \begin{itemize}
       \item Susceptible: it means that this person is susceptible to ketch the disease
@@ -35,4 +35,11 @@
     \end{itemize}
     The previous last two models are typically used to represent different epidemics disease such as HIV or SARS~\cite{hethcote2000mathematics}.
     
-    In the next session we are going to describe the algorithms that we used to generate the synthetic networks, then we will analyse and discuss the results and make some comparison with the result from the real network kept in analysis. 
+    \begin{figure}[t]
+        \centering
+        \includegraphics[width=\linewidth]{Figure/sir.png}
+        \caption{SIR model diagram}
+        \label{fig:SIRDiagram}
+    \end{figure}
+    
+    In the next session we are going to describe the algorithms that we used to generate the synthetic networks, then we will analyse and discuss the results and make some comparison with the result from the real network kept in analysis.
