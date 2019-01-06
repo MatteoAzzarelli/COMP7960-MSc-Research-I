@@ -5,12 +5,12 @@
 \section{Network Models}
     In this section we describe how we developed the algorithms to generate the synthetic networks and than the Facebook network.
     
-    To develop this models we decided to use \textbf{Python} because is a easy and very flexible language, in addition there are many libraries and documentation related to our topic.
+    To develop this models, we decided to use \textbf{Python} because is an easy and very flexible language, in addition there are many libraries and documentation related to our topic.
     We chose to use the library \textit{NetworkX}~\cite{NetworkX} because this library have a very fast learning curve.
     
     We made the assumption that the population are fully mixed, as described in this paper \cite{witten2007simulations}, so the susceptible population have a fixed probability $\beta$ per unit time to get the disease from any infected neighbour. The set of neighbour of a vertex $v \in V$ is denoted with $N_G(v) = \{u_1, u_2, ..., u_i \}$, where $u_k,~k=1,...,i$, is adjacent to a given vertex \verb|v|.
-    Than we need to define the fixed probability $\gamma$ per unit time that represent the probability to be recovered/immunised.
-    With this parameter we can model the population susceptible, infected and recovered by a system of ordinary differential equation \ref{eq:diffEq} proposed in the paper~\cite{witten2007simulations}:
+    Then we need to define the fixed probability $\gamma$ per unit time that represent the probability to be recovered/immunised.
+    With this parameter we can model the population susceptible, infected and recovered by a system of ordinary differential equation Eq.\ref{eq:diffEq} proposed in the paper~\cite{witten2007simulations}:
     
     \begin{equation}\label{eq:diffEq}
       \left\{\begin{matrix}
@@ -35,12 +35,7 @@ N = 1000
     connected
 P = 0.001
 
-# create a network with random neighboUr
-# numberOfNodes: number of nodes of this
-    graph
-# neighborProbability: probability to 
-    establish a link between two nodes
-    
+# create a network with random neighbour
 def createRandomNetwork():
     # create a new Graph for our social
         network
@@ -63,7 +58,8 @@ def createRandomNetwork():
     return G
         \end{lstlisting}
         
-        At the beginning we defined the number of nodes and the probability that a node have to establish a link with an other node. Then, in the function \verb|createRandomNetwork| we define the nodes and we generate a random number and make a comparison with the threshold, the probability that that node establish a connection, and if the random number is lower than the threshold we add that link to the graph \verb|G|.
+        At the beginning we defined the number of nodes and the probability that a node have to establish a link with another node.
+        Then, in the function \verb|createRandomNetwork| we define the nodes and we generate a random number and make a comparison with the threshold, the probability that that node establish a connection, and if the random number is lower than the threshold, we add that link to the graph \verb|G|.
         
         Because of the nature of random number, the nodes' degree distribution will follow the Poisson distribution, defined by the Eq.\ref{eq:poisson}.
         \begin{equation}\label{eq:poisson}
@@ -76,4 +72,88 @@ def createRandomNetwork():
             \includegraphics[width=\linewidth]{Figure/poissonDistribution.png}
             \caption{Poisson distribution graph}
             \label{fig:poissonDistribution}
+        \end{figure}
+        
+    \subsection{Random Preferential Attachment}
+        In this section we will describe how we implemented the random Preferential Attachment network generator.
+        
+        \begin{lstlisting}[language=Python, frame=single]]
+import networkx as nx
+
+# population number
+N = 1000
+
+# R0 basic reproduction number R0 in the 
+    epidemic stage was estimated as 
+    R0 = 1.5
+R0 = 1.5
+# fixed probability gamma per unit time 
+    of any infected becoming removed
+GAMMA = 0.267
+# fixed probability beta per unit time 
+    of contracting the disease from any
+    infected in the population
+BETA = R0 * GAMMA
+
+def createPreferencialAttachmentN(a,m):
+    # create a new Graph for our social
+        network
+    G = nx.Graph(
+        name="PreferencialAttachmentN")
+    for i in range(N):
+        G.add_node("node"+str(i),
+            state = sirv.SUSCEPTIBLE,
+            dayOfInfection = -1)
+    for source in G:
+        k0 = G.degree[source]
+        # print("possible N " + source)
+        for possibleNeighbour in G:
+            k = G.degree[source]
+            y = 2 + ((k0/a)/m)
+            pNode = beta(k + a, y)/
+                    beta(k0 + a, y - 1)
+            # print(pNode)
+            if(source != possibleNeighbour
+                and  random() < pNode):
+                G.add_edge(source, 
+                    possibleNeighbour)
+    return G
+        \end{lstlisting}
+        
+        In this case the probability to define if a node should establish a link or not is defined by the preferential attachment equation Eq.\ref{eq:prefAttach} \cite{wiky-prefAttach}.
+        \begin{equation}\label{eq:prefAttach}
+          P(k) = \frac{B(k+a,\gamma)}{B(K_0 + a, \gamma - 1)}
+        \end{equation}
+        
+        for $k \geq k_0$ and zero otherwise, where $B(x,y)$ is the Euler beta function Eq.\ref{eq:euler}:
+        \begin{equation}\label{eq:euler}
+          B(x,y) = \frac{\Gamma(x)\Gamma(y)}{\Gamma(x+y)}
+        \end{equation}
+        
+        with $\Gamma(x)$ is the standard gamma function, and $\gamma$ is defined as in the  Eq.\ref{eq:gamma}
+        \begin{equation}\label{eq:gamma}
+          B(x,y) = 2+ \frac{k_0+a}{m}
+        \end{equation}
+        where the constant $a > -k_0$ characterise the width of the curve and m is the number of link that will added, so this parameter influence the average nodes' degree, in other word the slope of our curve.
+        
+        This curve follows the Power law distribution, Fig.\ref{fig:PowerLaw}, in fact we have a very high pick in the left part of our graph and than a long tail in the right part of the graphic.
+      
+        \begin{figure}[t]
+            \centering
+            \includegraphics[width=\linewidth]{Figure/PowerLaw.png}
+            \caption{Power law distribution graph}
+            \label{fig:PowerLaw}
+        \end{figure}
+        
+        After compute the percentage we evaluate if a random number is bigger or not in order to define if the link will be added or not.
+        
+    \subsection{Real Facebook Network}
+        We imported the links of a real network based on Facebook. This data are collected by the Stanford University with the project SNAP \cite{stanford_Facebook}.
+        
+        This network is composed by 4039 Nodes and 88234 edges. Is possible see the shape of this network in the Fig.\ref{fig:Facebook}.
+        \begin{figure}[t]
+            \centering
+            \includegraphics[width=\linewidth]{Figure/FacebookGraph.png}
+            \caption{Facebook network graph}
+            \label{fig:Facebook}
         \end{figure}
