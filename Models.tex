@@ -19,8 +19,8 @@
         \frac{\mathrm{d} r}{\mathrm{d} t} = \gamma i
     \end{matrix}\right.
     \end{equation}
-    where s,i,r are respective the number of susceptible, infected and recovered person at that moment.
-    Where s in not increasing, i is not decreasing and the last equation is redundant since $(d/dt)(s + i + r) = 0$ implies that $s +i +r = N$, with \verb|N| the total number of nodes of graph $|V| \in G$, at all times.
+    where $s$,$i$,$r$ are respective the number of susceptible, infected and recovered person at that moment.
+    Where s in not increasing, i is not decreasing and the last equation is redundant since $(d/dt)(s + i + r) = 0$ implies that $s + i + r = N$, with \verb|N| the total number of nodes of graph $|V| \in G$, at all times.
     
     \subsection{Random Network}
         In this section we will describe how we implemented the random network generator.
@@ -157,3 +157,34 @@ def createPreferencialAttachmentN(a,m):
             \caption{Facebook network graph}
             \label{fig:Facebook}
         \end{figure}
+        
+    \subsection{How the disease spread}
+        In this section we are going to describe how we implements the spread of a disease.
+        
+        First of all we initialise all nodes by the following function: 
+        
+        \begin{lstlisting}[language=Python, frame=single]]
+def infection(node, infectionProbability):
+    if(random() < infectionProbability):
+        G.node[node]['state'] = 
+            sirv.INFECTED
+        G.node[node]['dayOfInfection'] = 
+            day
+        \end{lstlisting}
+        
+        So, given a random number if this is smaller than a fixed probability than that node become infected and we save the day of this event.
+        
+        Than every node have a probability to become infected that is proportional to how many infected neighbour have a node and how many days its in touch with them.
+        The probability of a susceptible node $n_s$ to became infected is:
+        
+        \begin{equation}
+            p(n_s) = \sum_{d=1}^{d_{infected}}{\sum_{m = 0}^{k_{nd}}{\beta * (d - m_d)}}
+        \end{equation}
+        where $d_{infected}$ is the day that the node $n_s$ need to became infected, $d$ is the current day, $k_{nd}$ is the number of infected neighbour of n at the day $d$, $\beta$ in a fixed probability on a node to became infected in our case we fixed $\beta=0.01$, than $d$ is the current day and $m_d$ is the day that the node $m$ was infected.
+        
+        Symmetrically, to calculate the probability that an infected node $n_i$ have to recover is:
+        
+        \begin{equation}
+            p(n_i) = \sum_{d=n_d}^{d_{recovered}}{\gamma * (d - n_d)}
+        \end{equation}
+        where $d_{recovered}$ is the day that the node $n_s$ pass form the state of infected to the state of recovered, $d$ is the current day, $n_d$ is the day that $n_i$ pass in the state of infected, $\gamma$ is the fixed probability to recover from the infection in our case it was fixed $\gamma=0.04$. 
